@@ -1,0 +1,27 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Editor/IDE files
+*.swp
+*.swo
+.*.sw[a-z]
+*~
+.#*
+
+# Build and runtime artifacts
+node_modules/
+venv/
+.venv
+__pycache__/
+dist/
+build/
+.sass-cache/
+
+# Environment and config
+.env
+.env.local
+npm-debug.log
+yarn-error.log   

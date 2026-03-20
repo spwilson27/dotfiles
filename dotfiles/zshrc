@@ -1,0 +1,79 @@
+
+[ -f "$HOME/.env" ] && source "$HOME/.env"
+[ -f "$HOME/.profile" ] && source "$HOME/.profile"
+[ -f "$HOME/.bash_aliases" ] && source "$HOME/.bash_aliases"
+
+# Add fzf completions dir
+typeset -gaU fpath=($fpath ~/.local/share/zsh/completions)   
+[ -f ~/.local/share/fzf/fzf.sh ] && source ~/.local/share/fzf/fzf.sh
+
+
+# =============================================================================
+# 1. history configuration
+# =============================================================================
+histfile=~/.zsh_history
+histsize=50000                 # keep plenty of history in memory
+savehist=50000                 # save plenty of history to disk
+setopt append_history          # append to history file (don't overwrite)
+setopt share_history           # share history across multiple terminal sessions
+setopt hist_ignore_all_dups    # delete older duplicated commands from history
+setopt hist_ignore_space       # don't record commands starting with a space (useful for secrets)
+setopt hist_reduce_blanks      # remove superfluous whitespace from history items
+
+# =============================================================================
+# 2. completion system
+# =============================================================================
+autoload -Uz compinit
+compinit
+
+# use a visual menu for completions (use arrow keys to navigate)
+zstyle ':completion:*' menu select
+
+# case-insensitive completion (e.g., typing 'cd doc<tab>' matches 'documents')
+zstyle ':completion:*' matcher-list 'm:{a-za-z}={a-za-z}'
+
+# =============================================================================
+# 3. quality of life options
+# =============================================================================
+setopt auto_cd                 # if you type a directory name, cd into it automatically
+setopt auto_pushd              # make `cd` behave like `pushd` (keeps a history of directories)
+setopt pushd_ignore_dups       # don't push multiple copies of the same directory onto the stack
+setopt interactive_comments    # allow comments in the interactive shell (starting with #)
+
+# =============================================================================
+# 4. keybindings
+# =============================================================================
+# make the up/down arrow keys search history based on what you've already typed.
+# e.g., type "git" and press up to see only previous "git" commands.
+bindkey '^[[a' up-line-or-search
+bindkey '^[[b' down-line-or-search
+
+# option+left/right to move word-by-word (standard macos keybinds)
+bindkey "^[b" backward-word
+bindkey "^[f" forward-word
+
+# =============================================================================
+# 5. aliases
+# =============================================================================
+# macos-specific colorized ls
+alias ls='ls -g'
+alias ll='ls -lh'              # list details
+alias la='ls -lah'             # list details including hidden files
+
+# colorize grep output
+alias grep='grep --color=auto'
+
+# navigation shortcuts
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# =============================================================================
+# 6. prompt configuration
+# =============================================================================
+# load colors
+autoload -Uz colors && colors
+
+
+PROMPT='%n@%m:%~$ '
+

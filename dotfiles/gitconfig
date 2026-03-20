@@ -1,0 +1,13 @@
+[credential]
+	helper = store
+[alias]
+	st = status
+[user]
+	name = Sean Wilson
+	email = spwilson27@gmail.com
+[core]
+	excludesfile = /home/mrwilson/.gitignore
+[http]
+	postBuffer = 157286400
+[init]
+	defaultBranch = main

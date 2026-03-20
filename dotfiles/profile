@@ -1,0 +1,12 @@
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+. "$HOME/.cargo/env"
+
+# Added by LM Studio CLI tool (lms)
+export PATH="$PATH:/home/mrwilson/.lmstudio/bin"
+
+. "$HOME/.local/bin/env"
+export DISCORD_WEBHOOK_URL='https://discord.com/api/webhooks/1480422823255080960/xiOjZbn8JjwurLLTsOSyetUhjbuX5OhPtucI8FIyXzpEMDV0lD19fEjvvIXl2waSFGmL'
+
+export PATH="/home/mrwilson/.pixi/bin:$PATH"
