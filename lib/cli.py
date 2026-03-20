@@ -2,13 +2,31 @@ from __future__ import annotations
 
 import argparse
 
+from lib.config_loader import load_config
 from lib.selftest import open_docker_shell, run_selftest
 from lib.setup_engine import run_setup
+
+
+def _available_tags() -> list[str]:
+    """Collect all unique tags defined across config entries."""
+    try:
+        entries = load_config()
+    except (ValueError, ImportError):
+        return []
+    tags: set[str] = set()
+    for entry in entries:
+        tags.update(entry.tags)
+    return sorted(tags)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Minimal dotfiles setup runner")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    available = _available_tags()
+    tag_help = "Select one or more tags. Repeat the flag or provide comma-separated values. Defaults to all."
+    if available:
+        tag_help += f" Available tags: {', '.join(available)}"
 
     setup_parser = subparsers.add_parser("setup", help="Run setup tasks from config.py")
     setup_parser.add_argument(
@@ -21,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="tags",
         action="append",
         default=None,
-        help="Select one or more tags. Repeat the flag or provide comma-separated values. Defaults to all.",
+        help=tag_help,
     )
 
     subparsers.add_parser("selftest", help="Run unit tests and Docker-based setup validation")

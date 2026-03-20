@@ -1,3 +1,5 @@
+#/usr/bin/env python3
+
 """
 Providers:
     - shell
@@ -5,6 +7,8 @@ Providers:
     - pip3
     - brew
     - function
+    - copy_dir
+    - copy_file
 
 OS:
     - linux (default detection)
@@ -12,51 +16,199 @@ OS:
     - linux-ubuntu
     - macos
 """
+import subprocess
+import os
+from dataclasses import dataclass, field
+from typing import List
 
-CONFIG = [
-    {
-        "name": "common-shell-marker",
-        "provider": "shell",
-        "target": [
-            'STATE_DIR="${DOTFILES_STATE_DIR:-$PWD/.dotfiles-state}"',
-            'mkdir -p "$STATE_DIR"',
-            'printf "setup-ran\n" > "$STATE_DIR/common-marker.txt"',
-        ],
-        "os": ["linux", "macos"],
-        "tags": ["all", "dotfile"],
-    },
-    {
-        "name": "ubuntu-selftest-package",
-        "provider": "apt",
-        "target": ["git"],
-        "os": ["linux-ubuntu"],
-        "tags": ["selftest"],
-    },
-    {
-        "name": "arch-selftest-command",
-        "provider": "shell",
-        "target": [
-            'cat > /usr/local/bin/dotfiles-selftest-arch <<\'EOF\'',
-            '#!/bin/sh',
-            'printf "arch-selftest-ok\n"',
-            'EOF',
-            'chmod +x /usr/local/bin/dotfiles-selftest-arch',
-        ],
-        "os": ["linux-arch"],
-        "tags": ["selftest"],
-    },
-    {
-        "name": "python-tooling-example",
-        "provider": "pip3",
-        "target": ["wheel"],
-        "os": ["linux", "macos"],
-        "tags": ["python-tools"],
-    },
-    {
-        "name": "macos-dev-example",
-        "provider": "brew",
-        "target": ["git"],
-        "os": ["macos"],
-        "tags": ["dev"],
-    },
+@dataclass
+class Runner:
+    dry_run: bool = False
+    returncode: int = 0
+
+    def secret_pass(self):
+        if not self.dry_run:
+            import getpass
+            return getpass.getpass("Secret Pass:")
+
+    def call(self, cmd: List[str], stdin_data=None):
+        if self.dry_run:
+            print(f'[dry-run] {cmd}')
+        else:
+            print(f'[running] {cmd}')
+            if stdin_data is not None:
+                result = subprocess.run(cmd, input=stdin_data.encode())
+                rc = result.returncode
+            else:
+                rc = subprocess.check_call(cmd)
+            if rc != 0:
+                self.returncode = rc
+
+    def shell(self, cmd: str, stdin=None):
+        if self.dry_run:
+            print(f'[dry-run] {cmd}')
+        else:
+            print(f'[running] {cmd}')
+            rc = subprocess.check_call(cmd, stdin=stdin, shell=True)
+            if rc != 0:
+                self.returncode = rc
+
+def multiline(txt):
+    return ' '.join(txt.split())
+
+@dataclass
+class Shell():
+    cmds: List[str]
+    tags: List[str] = field(default_factory=list)
+    os_: List[str] = field(default_factory=list)
+    def run(self, cmd_runner: Runner):
+        for c in self.cmds:
+            cmd_runner.shell(c)
+
+@dataclass
+class CopyFiles():
+    files: List[List[str]]
+    tags: List[str] = field(default_factory=list)
+    os_: List[str] = field(default_factory=list)
+
+    def run(self, cmd_runner: Runner, reverse=False):
+        for p in self.files:
+            p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
+            if reverse:
+                p.reverse()
+            cmd_runner.call(['rm', '-f', p[1]])
+            if dir_ := os.path.dirname(p[1]):
+                os.makedirs(dir_, exist_ok=True)
+            cmd_runner.call('cp --preserve=all'.split() + p)
+
+@dataclass
+class CopyDirs():
+    dirs: List[List[str]]
+    tags: List[str] = field(default_factory=list)
+    os_: List[str] = field(default_factory=list)
+
+    def run(self, cmd_runner: Runner, reverse=False):
+        for p in self.dirs:
+            p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
+            if reverse:
+                p.reverse()
+            cmd_runner.call('rm -rf'.split() + [p[1]])
+            cmd_runner.call('cp -ra'.split() + p)
+
+@dataclass
+class CopySecretFiles():
+    files: List[List[str]]
+    tags: List[str] = field(default_factory=list)
+    os_: List[str] = field(default_factory=list)
+
+    def run(self, cmd_runner: Runner, reverse=False):
+        if not self.files:
+            return
+        # Take password secretly, run gpg
+        #echo $PW | gpg --batch -c --passphrase-fd 0 --output file.gpg file.tx
+        pass_ = cmd_runner.secret_pass()
+        for p in self.files:
+            p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
+            if reverse:
+                # Write encrypted file to git store
+                cmd_runner.call('rm -f'.split() + [p[0]])
+                cmd_runner.call('gpg --batch --pinentry-mode loopback -c --passphrase-fd 0 --output'.split() + p, stdin_data=pass_)
+            else:
+                # Decrypt the file from git store
+                cmd_runner.call('gpg --batch --pinentry-mode loopback --decrypt --passphrase-fd 0 --output'.split() + [p[1], p[0]], stdin_data=pass_)
+
+config = [
+        Shell(
+            tags=['dev', 'install'],
+            os_=['linux-ubuntu'],
+            cmds = [
+            multiline('''
+apt update && sudo apt install -y
+build-essential 
+cmake 
+curl 
+gettext 
+git
+vim
+ninja-build 
+python3-pip
+rsync
+gcc
+gnupg2
+ripgrep 
+fd-find
+    '''),
+    '''
+curl -fsSL https://pixi.sh/install.sh | sh
+pixi global install nvim fzf uv
+
+# Uv #
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Rust #
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
+source ~/.cargo/env
+
+# Zellij
+# cargo install --locked zellij
+# zellij setup --generate-completion zsh >> $HOME/.local/share/zsh/completions
+    ''',
+                    '''
+sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
+                    '''
+
+                    ]
+            ),
+
+        #############
+        ### UNIX ###
+        CopyFiles(
+            os_=['linux', 'macos'],
+            tags=['dotfiles'],
+            files=[
+                ['dotfiles/zellij.kdl', '$HOME/.config/zellij/config.kdl'],
+                ['dotfiles/bashrc','$HOME/.bashrc'],
+                ['dotfiles/profile','$HOME/.profile'],
+                #['dotfiles/env','$HOME/.env'],
+                ['dotfiles/gitconfig','$HOME/.gitconfig'],
+                ['dotfiles/gitignore','$HOME/.gitignore'],
+                ['dotfiles/zshrc','$HOME/.zshrc'],
+                ['dotfiles/tmux-sessionizer.conf','$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf'],
+                ['dotfiles/tmux.conf','$HOME/.tmux.conf'],
+                ]
+            ),
+        CopyDirs(
+            os_=['linux', 'macos'],
+            tags=['dotfiles'],
+            dirs=[
+                ['dotfiles/nvim','$HOME/.config/nvim'],
+                #['dotfiles/gemini','$HOME/.gemini'],
+                #['dotfiles/claude','$HOME/.claude'],
+                #['zsh-completions', '$HOME/.local/share/zsh/completions'],
+                ]
+            ),
+
+        CopySecretFiles(
+            os_=['linux','macos'],
+            tags=['dotfiles','secrets'],
+            files=[
+                ['dotfiles/git-credentials.gpg', '$HOME/.git-credentials'],
+                ],
+            ),
+
+
+        #############
+        ### MACOS ###
+        Shell(
+                os_=['macos'],
+                cmds=[
+                    # Brew
+                    multiline('''
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                          '''),
+
+                    multiline('''
+brew install ninja cmake gettext curl git vim
+                  ''')]),
 ]
+
