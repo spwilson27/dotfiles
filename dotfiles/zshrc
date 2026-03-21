@@ -5,10 +5,12 @@ source_file() {
 source_file $HOME/.env
 source_file $HOME/.profile
 source_file $HOME/.bash_aliases
+source_file $HOME/.bun/bun_
 
 # Add fzf completions dir
 typeset -gaU fpath=($fpath ~/.local/share/zsh/completions)
 source <(fzf --zsh)
+
 
 # =============================================================================
 # 1. history configuration

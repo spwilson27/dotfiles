@@ -1,27 +1,36 @@
-# OS-specific files
-.DS_Store
-Thumbs.db
-*.log
-*.tmp
 
-# Editor/IDE files
-*.swp
+
+
+
+
+
+
+
+
+
+*.log
+*.out
+*.pyc
 *.swo
-.*.sw[a-z]
+*.tmp
 *~
 .#*
-
-# Build and runtime artifacts
-node_modules/
-venv/
-.venv
-__pycache__/
-dist/
-build/
-.sass-cache/
-
-# Environment and config
+.*.sw[a-z]
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+._*
 .env
 .env.local
+.sass-cache
+.venv
+Desktop.ini
+Thumbs.db
+__pycache__/
+build/
+dist/
+node_modules
 npm-debug.log
+venv
 yarn-error.log   

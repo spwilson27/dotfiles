@@ -6,9 +6,12 @@ source_file $HOME/.cargo/env
 source_file $HOME/.env-secret
 source_file $HOME/.local/share/fzf/fzf.sh
 
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.pixi/bin:$PATH"
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+export PATH="/home/mrwilson/.lmstudio/bin:$PATH"
 export PATH="$HOME/.local/share/agents:$PATH"
 export PATH="$HOME/.local/share/tmux-sessionizer:$PATH"
-export PATH="/home/mrwilson/.lmstudio/bin:$PATH"
-export PATH="$HOME/.pixi/bin:$PATH"
 
-
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
