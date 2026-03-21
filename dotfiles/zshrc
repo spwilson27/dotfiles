@@ -62,6 +62,7 @@ bindkey "^[f" forward-word
 # macos-specific colorized ls
 alias ll='ls -lh'              # list details
 alias la='ls -lah'             # list details including hidden files
+alias ts='tmux-sessionizer'
 
 # colorize grep output
 alias grep='grep --color=auto'
