@@ -8,6 +8,7 @@ source_file $HOME/.bash_aliases
 
 # Add fzf completions dir
 typeset -gaU fpath=($fpath ~/.local/share/zsh/completions)
+source <(fzf --zsh)
 
 # =============================================================================
 # 1. history configuration
@@ -57,7 +58,6 @@ bindkey "^[f" forward-word
 # 5. aliases
 # =============================================================================
 # macos-specific colorized ls
-alias ls='ls -g'
 alias ll='ls -lh'              # list details
 alias la='ls -lah'             # list details including hidden files
 

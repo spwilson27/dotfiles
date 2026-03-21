@@ -182,7 +182,7 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
                 ['dotfiles/zellij.kdl', '$HOME/.config/zellij/config.kdl'],
                 ['dotfiles/bashrc','$HOME/.bashrc'],
                 ['dotfiles/profile','$HOME/.profile'],
-                #['dotfiles/env','$HOME/.env'],
+                ['dotfiles/env','$HOME/.env'],
                 ['dotfiles/gitconfig','$HOME/.gitconfig'],
                 ['dotfiles/gitignore','$HOME/.gitignore'],
                 ['dotfiles/zshrc','$HOME/.zshrc'],
@@ -202,10 +202,11 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
             ),
         GitClone(
             os_=['linux', 'macos'],
-            tags=['dotfiles'],
+            tags=['dotfiles', 'repos'],
                 repos= [
                     ['https://github.com/spwilson27/nvim', '~/.config/nvim'],
-                    ['https://github.com/spwilson27/agents', '~/.local/share/agents']
+                    ['https://github.com/spwilson27/agents', '~/.local/share/agents'],
+                    ['https://github.com/spwilson27/tmux-sessionizer', '~/.local/share/tmux-sessionizer'],
                     ]
                 ),
 
