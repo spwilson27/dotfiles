@@ -79,7 +79,7 @@ class CopyFiles():
             cmd_runner.call(['rm', '-f', p[1]])
             if dir_ := os.path.dirname(p[1]):
                 os.makedirs(dir_, exist_ok=True)
-            cmd_runner.call('cp --preserve=all'.split() + p)
+            cmd_runner.call('cp -a'.split() + p)
 
 @dataclass
 class CopyDirs():
@@ -121,13 +121,13 @@ class CopySecretFiles():
         pass_ = cmd_runner.secret_pass()
         for p in self.files:
             p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
-            if not reverse:
+            if reverse:
                 # Write encrypted file to git store
-                cmd_runner.call('rm -f'.split() + [p[0]])
+                cmd_runner.call('rm -f'.split() + [p[1]])
                 cmd_runner.call('gpg --batch --pinentry-mode loopback -c --passphrase-fd 0 --output'.split() + p, stdin_data=pass_)
             else:
                 # Decrypt the file from git store
-                cmd_runner.call('rm -f'.split() + [p[0]])
+                cmd_runner.call('rm -f'.split() + [p[1]])
                 cmd_runner.call('gpg --batch --pinentry-mode loopback --decrypt --passphrase-fd 0 --output'.split() + [p[1], p[0]], stdin_data=pass_)
 
 config = [
@@ -223,6 +223,7 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
         ### MACOS ###
         Shell(
                 os_=['macos'],
+                tags=['all'],
                 cmds=[
                     # Brew
                     multiline('''
