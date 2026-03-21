@@ -1,0 +1,13 @@
+source_file() {
+	[ -f $1 ] && source $1
+}
+
+source_file $HOME/.cargo/env
+source_file $HOME/.env-secret
+source_file $HOME/.local/share/fzf/fzf.sh
+
+export PATH="$HOME/.local/share/agents:$PATH"
+export PATH="/home/mrwilson/.lmstudio/bin:$PATH"
+export PATH="$HOME/.pixi/bin:$PATH"
+
+

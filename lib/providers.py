@@ -47,6 +47,7 @@ class ProviderExecutor:
             "apt": self._run_apt,
             "brew": self._run_brew,
             "function": self._run_function,
+            "git_clone": self._run_git_clone,
             "pip3": self._run_pip3,
             "shell": self._run_shell,
         }
@@ -75,6 +76,15 @@ class ProviderExecutor:
 
     def _run_shell(self, target: Sequence[str]) -> None:
         self.runner.run_shell_script(target, check=True)
+
+    def _run_git_clone(self, target: Sequence[str]) -> None:
+        if len(target) != 2:
+            raise RuntimeError("git_clone target must be a (repo_url, destination) pair")
+        repo_url, destination = target
+        dest = os.path.expanduser(os.path.expandvars(destination))
+        if os.path.exists(dest):
+            shutil.rmtree(dest)
+        self.runner.run(["git", "clone", repo_url, dest], check=True)
 
     def _run_function(self, target: object) -> None:
         callable_target = resolve_function_target(target)

@@ -1,6 +1,3 @@
-[submodule "scripts/tmux-sessionizer"]
-	path = scripts/tmux-sessionizer
-	url = https://github.com/spwilson27/tmux-sessionizer
 [submodule "nvim"]
 	path = dotfiles/nvim
 	url = https://github.com/spwilson27/nvim

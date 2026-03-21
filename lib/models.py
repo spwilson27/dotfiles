@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Sequence, Tuple
 
 
-SUPPORTED_PROVIDERS = {"apt", "brew", "function", "pip3", "shell"}
+SUPPORTED_PROVIDERS = {"apt", "brew", "function", "git_clone", "pip3", "shell"}
 SUPPORTED_OS_TARGETS = {"macos", "linux", "linux-ubuntu", "linux-arch"}
 
 

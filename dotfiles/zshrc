@@ -1,12 +1,13 @@
+source_file() {
+	[ -f $1 ] && source $1
+}
 
-[ -f "$HOME/.env" ] && source "$HOME/.env"
-[ -f "$HOME/.profile" ] && source "$HOME/.profile"
-[ -f "$HOME/.bash_aliases" ] && source "$HOME/.bash_aliases"
+source_file $HOME/.env
+source_file $HOME/.profile
+source_file $HOME/.bash_aliases
 
 # Add fzf completions dir
-typeset -gaU fpath=($fpath ~/.local/share/zsh/completions)   
-[ -f ~/.local/share/fzf/fzf.sh ] && source ~/.local/share/fzf/fzf.sh
-
+typeset -gaU fpath=($fpath ~/.local/share/zsh/completions)
 
 # =============================================================================
 # 1. history configuration
@@ -74,6 +75,5 @@ alias ....='cd ../../..'
 # load colors
 autoload -Uz colors && colors
 
-
-PROMPT='%n@%m:%~$ '
+PROMPT='%n@%m:%~ $ '
 

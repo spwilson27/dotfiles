@@ -96,6 +96,18 @@ class CopyDirs():
             cmd_runner.call('cp -ra'.split() + p)
 
 @dataclass
+class GitClone():
+    repos: List[List[str]]
+    tags: List[str] = field(default_factory=list)
+    os_: List[str] = field(default_factory=list)
+
+    def run(self, cmd_runner: Runner, reverse=False):
+        for p in self.repos:
+            p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
+            cmd_runner.call('rm -rf'.split() + [p[1]])
+            cmd_runner.call('git clone'.split() + p)
+
+@dataclass
 class CopySecretFiles():
     files: List[List[str]]
     tags: List[str] = field(default_factory=list)
@@ -109,12 +121,13 @@ class CopySecretFiles():
         pass_ = cmd_runner.secret_pass()
         for p in self.files:
             p = [os.path.expanduser(os.path.expandvars(f)) for f in p]
-            if reverse:
+            if not reverse:
                 # Write encrypted file to git store
                 cmd_runner.call('rm -f'.split() + [p[0]])
                 cmd_runner.call('gpg --batch --pinentry-mode loopback -c --passphrase-fd 0 --output'.split() + p, stdin_data=pass_)
             else:
                 # Decrypt the file from git store
+                cmd_runner.call('rm -f'.split() + [p[0]])
                 cmd_runner.call('gpg --batch --pinentry-mode loopback --decrypt --passphrase-fd 0 --output'.split() + [p[1], p[0]], stdin_data=pass_)
 
 config = [
@@ -181,12 +194,20 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
             os_=['linux', 'macos'],
             tags=['dotfiles'],
             dirs=[
-                ['dotfiles/nvim','$HOME/.config/nvim'],
+                #['dotfiles/nvim','$HOME/.config/nvim'],
                 #['dotfiles/gemini','$HOME/.gemini'],
                 #['dotfiles/claude','$HOME/.claude'],
                 #['zsh-completions', '$HOME/.local/share/zsh/completions'],
                 ]
             ),
+        GitClone(
+            os_=['linux', 'macos'],
+            tags=['dotfiles'],
+                repos= [
+                    ['https://github.com/spwilson27/nvim', '~/.config/nvim'],
+                    ['https://github.com/spwilson27/agents', '~/.local/share/agents']
+                    ]
+                ),
 
         CopySecretFiles(
             os_=['linux','macos'],
