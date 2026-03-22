@@ -201,7 +201,6 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
             tags=['dotfiles', 'repos'],
                 repos= [
                     ['https://github.com/spwilson27/nvim', '~/.config/nvim'],
-                    ['https://github.com/spwilson27/agents', '~/.local/share/agents'],
                     ['https://github.com/spwilson27/tmux-sessionizer', '~/.local/share/tmux-sessionizer'],
                     ]
                 ),
@@ -240,6 +239,10 @@ pixi global install nvim fzf uv
 # Rust #
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
 source ~/.cargo/env
+
+rm -rf ~/.local/share/agents
+git clone https://github.com/spwilson27/agents ~/.local/share/agents
+cargo install --path ~/.local/share/agents
                   ''']),
 ]
 
