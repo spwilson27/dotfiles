@@ -218,7 +218,7 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
         ### MACOS ###
         Shell(
                 os_=['macos'],
-                tags=['all'],
+                tags=['all', 'install'],
                 cmds=[
                     # Brew
                     multiline('''
@@ -234,7 +234,7 @@ colima start
                   ''']),
         Shell(
                 os_=['macos', 'linux'],
-                tags=['all'],
+                tags=['all', 'install'],
                 cmds=[
                     '''
 curl -fsSL https://pixi.sh/install.sh | sh
@@ -247,6 +247,12 @@ source ~/.cargo/env
 rm -rf ~/.local/share/agents
 git clone https://github.com/spwilson27/agents ~/.local/share/agents
 cargo install --path ~/.local/share/agents
+
+npm install -g \
+    @anthropic-ai/claude-code \
+    @google/gemini-cli \
+    @qwen-code/qwen-code \
+    @openai/codex
                   ''']),
 ]
 
