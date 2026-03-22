@@ -227,7 +227,11 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
 
                     multiline('''
 brew install ninja cmake gettext curl git vim
-                  ''')]),
+                  '''),
+                    '''
+brew install colima docker docker-compose docker-buildx ripgrep
+colima start
+                  ''']),
         Shell(
                 os_=['macos', 'linux'],
                 tags=['all'],
