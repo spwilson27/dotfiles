@@ -152,11 +152,6 @@ ripgrep
 fd-find
     '''),
     '''
-curl -fsSL https://pixi.sh/install.sh | sh
-pixi global install nvim fzf uv
-
-# Uv #
-curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Rust #
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
@@ -188,6 +183,7 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
                 ['dotfiles/zshrc','$HOME/.zshrc'],
                 ['dotfiles/tmux-sessionizer.conf','$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf'],
                 ['dotfiles/tmux.conf','$HOME/.tmux.conf'],
+                ['dotfiles/tmux.conf','$HOME/.config/tmux/tmux.conf'],
                 ]
             ),
         CopyDirs(
@@ -233,5 +229,17 @@ sudo bash -c "echo '%sudo    ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
                     multiline('''
 brew install ninja cmake gettext curl git vim
                   ''')]),
+        Shell(
+                os_=['macos', 'linux'],
+                tags=['all'],
+                cmds=[
+                    '''
+curl -fsSL https://pixi.sh/install.sh | sh
+pixi global install nvim fzf uv
+
+# Rust #
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
+source ~/.cargo/env
+                  ''']),
 ]
 
