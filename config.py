@@ -136,7 +136,7 @@ config = [
             os_=['linux-ubuntu'],
             cmds = [
             multiline('''
-apt update && sudo apt install -y
+sudo apt update && sudo apt install -y
 build-essential 
 cmake 
 curl 
@@ -155,7 +155,6 @@ fd-find
 
 # Rust #
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
-source ~/.cargo/env
 
 # Zellij
 # cargo install --locked zellij
@@ -242,11 +241,18 @@ pixi global install nvim fzf uv
 
 # Rust #
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable
-source ~/.cargo/env
 
 rm -rf ~/.local/share/agents
 git clone https://github.com/spwilson27/agents ~/.local/share/agents
 cargo install --path ~/.local/share/agents
+
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# Install the latest Node.js (which includes the latest npm)
+nvm install node
+# Verify
+node -v
+npm -v
 
 npm install -g \
     @anthropic-ai/claude-code \
